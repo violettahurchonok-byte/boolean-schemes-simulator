@@ -75,11 +75,12 @@ function drawNode(node, x, y) {
 }
 
 
-// Запустити імпульс
+// Запуск анімації імпульсів по всій схемі
 function runSimulation() {
   const workspace = document.getElementById("workspace");
+  const variables = workspace.getElementsByClassName("variable");
 
-  variables.forEach((variable, index) => {
+  Array.from(variables).forEach((variable, index) => {
     const pulse = document.createElement("div");
     pulse.className = "pulse";
 
@@ -93,16 +94,27 @@ function runSimulation() {
 
     workspace.appendChild(pulse);
 
-    // Анімація руху вправо
-    let pos = 20;
+    // Анімація: рух до першої операції
+    let pos = parseInt(variable.style.left);
+    const targetX = 150; // координата першої операції
     const interval = setInterval(() => {
       pos += 2;
       pulse.style.left = pos + "px";
 
-      // Зупинка біля операцій
-      if (pos > 140) {
+      if (pos >= targetX) {
         clearInterval(interval);
+
+        // Зміна кольору залежно від операції
+        const operations = workspace.getElementsByClassName("operation");
+        if (operations.length > 0) {
+          const op = operations[0].innerText;
+          if (op === "AND") pulse.style.backgroundColor = "green";
+          if (op === "OR") pulse.style.backgroundColor = "blue";
+          if (op === "NOT") pulse.style.backgroundColor = "red";
+        }
       }
     }, 50);
   });
+}
+
 }
