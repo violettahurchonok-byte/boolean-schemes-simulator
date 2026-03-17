@@ -30,6 +30,50 @@ function addOperation(type) {
   workspace.appendChild(div);
   operations.push(div);
 }
+// Побудова схеми за введеною булевою функцією
+function buildScheme() {
+  const input = document.getElementById("booleanInput").value;
+
+  try {
+    // Парсимо вираз через Math.js
+    const expr = math.parse(input);
+
+    // Очищаємо робоче поле
+    const workspace = document.getElementById("workspace");
+    workspace.innerHTML = "";
+
+    // Малюємо дерево операцій
+    drawNode(expr, 50, 50);
+  } catch (error) {
+    alert("Помилка у виразі: " + error.message);
+  }
+}
+
+// Рекурсивне малювання вузлів (змінні та операції)
+function drawNode(node, x, y) {
+  const workspace = document.getElementById("workspace");
+  const div = document.createElement("div");
+
+  if (node.isSymbolNode) {
+    div.className = "variable";
+    div.innerText = node.name;
+  } else if (node.isOperatorNode) {
+    div.className = "operation";
+    div.innerText = node.op; // AND, OR, NOT
+  }
+
+  div.style.top = y + "px";
+  div.style.left = x + "px";
+  workspace.appendChild(div);
+
+  // Якщо є аргументи — малюємо їх нижче
+  if (node.args) {
+    node.args.forEach((arg, i) => {
+      drawNode(arg, x + 150, y + i * 80);
+    });
+  }
+}
+
 
 // Запустити імпульс
 function runSimulation() {
