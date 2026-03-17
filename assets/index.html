@@ -9,18 +9,35 @@
 </head>
 <body>
   <h1>Симулятор логічних схем</h1>
-  <input type="text" id="booleanInput" placeholder="Введіть булеву функцію">
-<button onclick="buildScheme()">Побудувати схему</button>
 
-
+  <!-- Панель керування -->
   <div id="controls">
-    <button onclick="addVariable()">Додати змінну</button>
-    <button onclick="addOperation('AND')">І</button>
-    <button onclick="addOperation('OR')">АБО</button>
-    <button onclick="addOperation('NOT')">НЕ</button>
+    <!-- Поле для вводу функції -->
+    <input type="text" id="booleanInput" placeholder="Функція буде збиратись тут">
+
+    <!-- Кнопки змінних -->
+    <button onclick="insertSymbol('x')">X</button>
+    <button onclick="insertSymbol('y')">Y</button>
+    <button onclick="insertSymbol('z')">Z</button>
+
+    <!-- Кнопки операцій -->
+    <button onclick="insertSymbol(' AND ')">І</button>
+    <button onclick="insertSymbol(' OR ')">АБО</button>
+    <button onclick="insertSymbol(' NOT ')">НЕ</button>
+    <button onclick="insertSymbol(' XOR ')">⊕ (XOR)</button>
+    <button onclick="insertSymbol(' NAND ')">І-НЕ (NAND)</button>
+    <button onclick="insertSymbol(' NOR ')">АБО-НЕ (NOR)</button>
+
+    <!-- Дужки -->
+    <button onclick="insertSymbol('(')">(</button>
+    <button onclick="insertSymbol(')')">)</button>
+
+    <!-- Кнопки дій -->
+    <button onclick="buildScheme()">Побудувати схему</button>
     <button onclick="runSimulation()">Запустити імпульс</button>
   </div>
 
+  <!-- Робоче поле -->
   <div id="workspace"></div>
 
   <script src="script.js"></script>
