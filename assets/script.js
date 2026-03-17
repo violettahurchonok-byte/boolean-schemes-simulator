@@ -30,12 +30,15 @@ function drawNode(node, x, y) {
     div.innerText = node.name;
   } else if (node.isOperatorNode) {
     div.className = "operation";
-    div.innerText = node.op; // AND, OR, NOT, XOR, NAND, NOR
+    div.innerText = node.op;
   }
 
   div.style.top = y + "px";
   div.style.left = x + "px";
   workspace.appendChild(div);
+
+  // Зберігаємо координати вузла
+  node.ui = { x: x, y: y };
 
   if (node.args) {
     node.args.forEach((arg, i) => {
@@ -44,43 +47,62 @@ function drawNode(node, x, y) {
   }
 }
 
-// Анімація імпульсів
+// Запуск імпульсів по всьому дереву
 function runSimulation() {
+  const input = document.getElementById("booleanInput").value;
+  try {
+    const expr = math.parse(input);
+    animatePulse(expr);
+  } catch (error) {
+    alert("Спочатку побудуйте правильну схему!");
+  }
+}
+
+// Рекурсивна анімація імпульсу
+function animatePulse(node) {
   const workspace = document.getElementById("workspace");
-  const variables = workspace.getElementsByClassName("variable");
 
-  Array.from(variables).forEach((variable, index) => {
-    const pulse = document.createElement("div");
-    pulse.className = "pulse";
+  // Створюємо імпульс
+  const pulse = document.createElement("div");
+  pulse.className = "pulse";
+  pulse.style.backgroundColor = "yellow";
+  pulse.style.top = node.ui.y + "px";
+  pulse.style.left = node.ui.x + "px";
+  workspace.appendChild(pulse);
 
-    const colors = ["yellow", "blue", "red", "green", "orange"];
-    pulse.style.backgroundColor = colors[index % colors.length];
+  // Якщо є аргументи — рухаємо імпульс до них
+  if (node.args) {
+    node.args.forEach((arg, i) => {
+      let posX = node.ui.x;
+      let posY = node.ui.y;
+      const targetX = arg.ui.x;
+      const targetY = arg.ui.y;
 
-    pulse.style.top = variable.style.top;
-    pulse.style.left = variable.style.left;
+      const interval = setInterval(() => {
+        // Плавний рух
+        posX += (targetX - posX) / 10;
+        posY += (targetY - posY) / 10;
+        pulse.style.left = posX + "px";
+        pulse.style.top = posY + "px";
 
-    workspace.appendChild(pulse);
+        // Коли досягли аргументу
+        if (Math.abs(posX - targetX) < 2 && Math.abs(posY - targetY) < 2) {
+          clearInterval(interval);
 
-    let pos = parseInt(variable.style.left);
-    const targetX = 150;
-    const interval = setInterval(() => {
-      pos += 2;
-      pulse.style.left = pos + "px";
+          // Зміна кольору залежно від операції
+          if (node.isOperatorNode) {
+            if (node.op === "AND") pulse.style.backgroundColor = "green";
+            if (node.op === "OR") pulse.style.backgroundColor = "blue";
+            if (node.op === "NOT") pulse.style.backgroundColor = "red";
+            if (node.op === "XOR") pulse.style.backgroundColor = "purple";
+            if (node.op === "NAND") pulse.style.backgroundColor = "orange";
+            if (node.op === "NOR") pulse.style.backgroundColor = "brown";
+          }
 
-      if (pos >= targetX) {
-        clearInterval(interval);
-
-        const operations = workspace.getElementsByClassName("operation");
-        if (operations.length > 0) {
-          const op = operations[0].innerText;
-          if (op === "AND") pulse.style.backgroundColor = "green";
-          if (op === "OR") pulse.style.backgroundColor = "blue";
-          if (op === "NOT") pulse.style.backgroundColor = "red";
-          if (op === "XOR") pulse.style.backgroundColor = "purple";
-          if (op === "NAND") pulse.style.backgroundColor = "orange";
-          if (op === "NOR") pulse.style.backgroundColor = "brown";
+          // Запускаємо імпульс далі
+          animatePulse(arg);
         }
-      }
-    }, 50);
-  });
+      }, 50);
+    });
+  }
 }
